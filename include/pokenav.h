@@ -43,7 +43,8 @@ struct UnkUsePokeblockSub {
 };
 
 struct UnkPokenavStruct {
-    /*0x0000*/ u8 filler0000[0x306];
+    /*0x0000*/ u32 unk0000[10]; // ??
+    /*0x0028*/ u8 filler0000[0x2DE];
     /*0x0306*/ u16 unk306;
     /*0x0306*/ u8 filler0308[0x4];
     /*0x030C*/ union { // TODO: what?
@@ -67,12 +68,20 @@ struct UnkPokenavStruct {
     /*0x76AA*/ u8 unk76AA;
     /*0x76AB*/ u8 filler76AB[0x10bd];
     /*0x8768*/ struct UnkPokenavStruct_Sub2 *unk8768;
-    /*0x876C*/ u8 filler876C[0x2];
-    /*0x876E*/ u8 unk876E;
-    /*0x876F*/ u8 filler876F[0x7];
+    /*0x876C*/ s16 unk876C;
+    /*0x876E*/ s16 unk876E;
+    /*0x8770*/ s16 unk8770;
+    /*0x8772*/ s16 unk8772;
+    /*0x8774*/ s16 unk8774;
     /*0x8776*/ u16 unk8776;
     /*0x8778*/ u16 unk8778;
-    /*0x877A*/ u8 filler877A[0xE];
+    /*0x877A*/ u16 unk877A;
+    /*0x877C*/ s16 unk877C;
+    /*0x877E*/ u16 unk877E;
+    /*0x8780*/ u16 unk8780;
+    /*0x8782*/ u8 filler8782[0x2];
+    /*0x8784*/ u16 unk8784;
+    /*0x8786*/ u16 unk8786;
     /*0x8788*/ u8 unk8788[0x40];
     /*0x87C8*/ u8 unk87C8;
     /*0x87C9*/ u8 filler87C9;
@@ -108,13 +117,18 @@ struct UnkPokenavStruct {
     /*0xCE8E*/ u16 palettesCE8E[0x2D];
     /*0xCEE8*/ struct UnkPokenavStruct_Sub unkCEE8[78];
     /*0xD158*/ u16 unkD158;
-    /*0xD15A*/ u8 fillerD15A[6];
+    /*0xD15A*/ u8 fillerD15A[2];
+    /*0xD15C*/ u16 unkD15C;
+    /*0xD15E*/ u8 fillerD15E[2];
     /*0xD160*/ u16 unkD160;
     /*0xD162*/ u8 unkD162[2];
     /*0xD164*/ struct UnkPokenavStruct_Sub1 unkD164;
 };
 
 extern struct UnkPokenavStruct *const gUnknown_083DFEC4;
+extern u32 gUnknown_083E03A0; // FIXME: type
+extern u32 gUnknown_083E039C;
+
 
 bool8 sub_80F170C(void);
 bool8 sub_80F1778(void);

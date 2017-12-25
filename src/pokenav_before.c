@@ -130,6 +130,9 @@ extern const u8 gPokenavHoennMapMisc_Gfx[];
 extern const u8 gUnknown_08E99FB0[];
 extern const u8 gUnknown_08E9A100[];
 extern const u16 gPokenavHoennMap1_Pal[];
+extern const u8 gOtherText_NumberRegistered[];
+extern const u8 gOtherText_NumberBattles[];
+
 
 static void sub_80EBCA8();
 static void sub_80EEE20();
@@ -170,7 +173,7 @@ static void sub_80EE8F4();
 static void sub_80EEDC4();
 
 extern bool8 sub_80F0944(void);
-extern void sub_80F081C();
+extern void sub_80F081C(u8);
 extern void sub_80F0900(void);
 extern void sub_80F443C(u8 *, u16);
 extern bool8 sub_80F162C(u8);
@@ -293,6 +296,11 @@ extern void sub_80EFE7C(void);
 extern void sub_80F5BF0();
 extern void sub_80F6F64();
 extern void sub_80F19FC();
+extern void sub_80F0954(u16, u16, u16);
+extern bool8 sub_80F098C(void);
+extern void sub_80F445C(u8*, u16);
+extern void __call_via_r2(u16, u16, u16);
+extern void sub_80F4428(u8 *, u16, u16);
 
 extern u16 gKeyRepeatStartDelay;
 
@@ -308,7 +316,7 @@ void sub_80EBA5C() {
 				gMain.state++;
 				SetMainCallback2(&sub_80EBBE8);
 				break;
-			} 
+			}
 			break;
 		case 1:
 			SetVBlankCallback(NULL);
@@ -331,7 +339,7 @@ void sub_80EBA5C() {
 		case 7:
 			sub_80F1A90();
 			gMain.state++;
-		case 8: 
+		case 8:
 			if (sub_80F1AC4()) return;
 			break;
 		case 9:
@@ -535,7 +543,7 @@ void sub_80EBDD8() {
 			sub_80EBDBC(&sub_80EC268);
 		}
 		return;
-		
+
 	}
 
 }
@@ -584,7 +592,7 @@ void sub_80EC00C() {
 		ewram0_10.var304++;
 		return;
 	case 9:
-		sub_80F2598(); 
+		sub_80F2598();
 		ewram0_10.var304++;
 		break;
 	case 10:
@@ -4335,7 +4343,7 @@ void sub_80EFE7C(void)
 	case 2:
 		sub_80EFDE4(1);
 		gUnknown_083DFEC4->unk769D = 1;
-		break;	
+		break;
 	}
 }
 
@@ -5003,3 +5011,665 @@ _080F0638: .4byte 0x00000306\n\
     .syntax divided\n");
 }
 #endif // NONMATCHING
+
+#if 0
+void sub_80F063C(s16 arg0) {
+	u16 r6;
+	u16 r2;
+	u16 r5;
+	s16 tmp;
+
+	gUnknown_083DFEC4->unk877C = arg0 << 4;
+	if (arg0 == 1 || arg0 == -1) {
+		tmp = 4;
+	}
+	else {
+		tmp = 8;
+	}
+	gUnknown_083DFEC4->unk877A = tmp;
+
+	if (arg0 < 0) {
+		gUnknown_083DFEC4->unk877A = -gUnknown_083DFEC4->unk877A;
+		r6 = gUnknown_083DFEC4->unk8778 + arg0*2;
+		r2 = gUnknown_083DFEC4->unk8770 + arg0;
+		if ((s16)r2 < 0) {
+			r2 = gUnknown_083DFEC4->unk8774 + r2 + 1;
+		}
+		r5 = r2 - arg0;
+	}
+	else {
+		r6 = gUnknown_083DFEC4->unk8778 + 0x10;
+		r2 = gUnknown_083DFEC4->unk8772 + 0x1;
+		r5 = arg0;
+	}
+	if ((s16)r2 > gUnknown_083DFEC4->unk8774) {
+		r2 = 0;
+	}
+	sub_80F0954(r2, r6 & 0x1F, r5);
+}
+#else
+__attribute__((naked))
+void sub_80F063C(void) {
+asm_unified("push {r4-r7,lr} \n\
+	lsls r0, 16 \n\
+	ldr r3, _080F0664 @ =gUnknown_083DFEC4 \n\
+	ldr r2, [r3] \n\
+	lsrs r5, r0, 16 \n\
+	asrs r4, r0, 16 \n\
+	lsls r1, r4, 4 \n\
+	ldr r6, _080F0668 @ =0x0000877c \n\
+	adds r0, r2, r6 \n\
+	strh r1, [r0] \n\
+	adds r7, r3, 0 \n\
+	cmp r4, 0x1 \n\
+	beq _080F065E \n\
+	movs r0, 0x1 \n\
+	negs r0, r0 \n\
+	cmp r4, r0 \n\
+	bne _080F066C \n\
+_080F065E: \n\
+	movs r1, 0x4 \n\
+	b _080F066E \n\
+	.align 2, 0 \n\
+_080F0664: .4byte gUnknown_083DFEC4 \n\
+_080F0668: .4byte 0x0000877c \n\
+_080F066C: \n\
+	movs r1, 0x8 \n\
+_080F066E: \n\
+	ldr r3, _080F06C0 @ =0x0000877a \n\
+	adds r0, r2, r3 \n\
+	strh r1, [r0] \n\
+	lsls r0, r5, 16 \n\
+	asrs r3, r0, 16 \n\
+	cmp r3, 0 \n\
+	bge _080F06CC \n\
+	ldr r4, [r7] \n\
+	ldr r6, _080F06C0 @ =0x0000877a \n\
+	adds r1, r4, r6 \n\
+	movs r2, 0 \n\
+	ldrsh r0, [r1, r2] \n\
+	negs r0, r0 \n\
+	strh r0, [r1] \n\
+	subs r6, 0x2 \n\
+	adds r1, r4, r6 \n\
+	lsls r0, r3, 1 \n\
+	ldrh r1, [r1] \n\
+	adds r0, r1 \n\
+	lsls r0, 16 \n\
+	lsrs r6, r0, 16 \n\
+	ldr r1, _080F06C4 @ =0x00008770 \n\
+	adds r0, r4, r1 \n\
+	ldrh r0, [r0] \n\
+	adds r0, r3, r0 \n\
+	lsls r0, 16 \n\
+	lsrs r2, r0, 16 \n\
+	asrs r0, 16 \n\
+	cmp r0, 0 \n\
+	bge _080F06B8 \n\
+	ldr r2, _080F06C8 @ =0x00008774 \n\
+	adds r1, r4, r2 \n\
+	adds r0, 0x1 \n\
+	ldrh r1, [r1] \n\
+	adds r0, r1 \n\
+	lsls r0, 16 \n\
+	lsrs r2, r0, 16 \n\
+_080F06B8: \n\
+	negs r0, r3 \n\
+	lsls r0, 16 \n\
+	lsrs r5, r0, 16 \n\
+	b _080F06E6 \n\
+	.align 2, 0 \n\
+_080F06C0: .4byte 0x0000877a \n\
+_080F06C4: .4byte 0x00008770 \n\
+_080F06C8: .4byte 0x00008774 \n\
+_080F06CC: \n\
+	ldr r1, [r7] \n\
+	ldr r3, _080F070C @ =0x00008778 \n\
+	adds r0, r1, r3 \n\
+	ldrh r0, [r0] \n\
+	adds r0, 0x10 \n\
+	lsls r0, 16 \n\
+	lsrs r6, r0, 16 \n\
+	ldr r0, _080F0710 @ =0x00008772 \n\
+	adds r1, r0 \n\
+	ldrh r0, [r1] \n\
+	adds r0, 0x1 \n\
+	lsls r0, 16 \n\
+	lsrs r2, r0, 16 \n\
+_080F06E6: \n\
+	ldr r0, [r7] \n\
+	ldr r1, _080F0714 @ =0x00008774 \n\
+	adds r0, r1 \n\
+	lsls r1, r2, 16 \n\
+	asrs r1, 16 \n\
+	movs r3, 0 \n\
+	ldrsh r0, [r0, r3] \n\
+	cmp r1, r0 \n\
+	ble _080F06FA \n\
+	movs r2, 0 \n\
+_080F06FA: \n\
+	movs r1, 0x1F \n\
+	adds r0, r2, 0 \n\
+	ands r1, r6 \n\
+	adds r2, r5, 0 \n\
+	bl sub_80F0954 \n\
+	pop {r4-r7} \n\
+	pop {r0} \n\
+	bx r0 \n\
+	.align 2, 0 \n\
+_080F070C: .4byte 0x00008778 \n\
+_080F0710: .4byte 0x00008772 \n\
+_080F0714: .4byte 0x00008774");
+}
+#endif
+
+#if 0
+bool8 sub_80F0718(void) {
+	s16 tmp0;
+	s16 tmp1;
+	s16 tmp2;
+	if (sub_80F098C()) return TRUE;
+	if (!gUnknown_083DFEC4->unk877C) return FALSE;
+	else {
+		gUnknown_083DFEC4->unk877C -= gUnknown_083DFEC4->unk877A;
+		gUnknown_083DFEC4->unk8776 = (gUnknown_083DFEC4->unk8776 + gUnknown_083DFEC4->unk877A) & 0xFF;
+		REG_BG3VOFS = gUnknown_083DFEC4->unk8776;
+		if (gUnknown_083DFEC4->unk877C) return TRUE;
+		tmp0 = gUnknown_083DFEC4->unk8776;
+		tmp1 = (tmp0 + 0x8) & 0xFF;
+		// lsr -> asr
+		tmp2 = tmp1 >> 3;
+		gUnknown_083DFEC4->unk8778 = tmp2;
+		return FALSE;
+	}
+}
+#else
+__attribute__((naked))
+bool8 sub_80F0718(void) {
+asm_unified("push {r4,r5,lr}\n\
+	bl sub_80F098C\n\
+	lsls r0, 24\n\
+	cmp r0, 0\n\
+	bne _080F0790\n\
+	ldr r0, _080F073C @ =gUnknown_083DFEC4\n\
+	ldr r4, [r0]\n\
+	ldr r0, _080F0740 @ =0x0000877c\n\
+	adds r3, r4, r0\n\
+	ldrh r2, [r3]\n\
+	movs r1, 0\n\
+	ldrsh r0, [r3, r1]\n\
+	cmp r0, 0\n\
+	bne _080F0744\n\
+	movs r0, 0\n\
+	b _080F0792\n\
+	.align 2, 0\n\
+_080F073C: .4byte gUnknown_083DFEC4\n\
+_080F0740: .4byte 0x0000877c\n\
+_080F0744:\n\
+	ldr r0, _080F0780 @ =0x0000877a\n\
+	adds r1, r4, r0\n\
+	ldrh r0, [r1]\n\
+	subs r0, r2, r0\n\
+	strh r0, [r3]\n\
+	ldr r0, _080F0784 @ =0x00008776\n\
+	adds r2, r4, r0\n\
+	ldrh r0, [r1]\n\
+	ldrh r1, [r2]\n\
+	adds r0, r1\n\
+	movs r5, 0xFF\n\
+	ands r0, r5\n\
+	strh r0, [r2]\n\
+	ldr r1, _080F0788 @ =REG_BG3VOFS\n\
+	strh r0, [r1]\n\
+	movs r1, 0\n\
+	ldrsh r0, [r3, r1]\n\
+	cmp r0, 0\n\
+	bne _080F0790\n\
+	movs r1, 0\n\
+	ldrsh r0, [r2, r1]\n\
+	adds r0, 0x8\n\
+	ands r0, r5\n\
+	asrs r1, r0, 3\n\
+	ldr r2, _080F078C @ =0x00008778\n\
+	adds r0, r4, r2\n\
+	strh r1, [r0]\n\
+	movs r0, 0\n\
+	b _080F0792\n\
+	.align 2, 0\n\
+_080F0780: .4byte 0x0000877a\n\
+_080F0784: .4byte 0x00008776\n\
+_080F0788: .4byte REG_BG3VOFS\n\
+_080F078C: .4byte 0x00008778\n\
+_080F0790:\n\
+	movs r0, 0x1\n\
+_080F0792:\n\
+	pop {r4,r5}\n\
+	pop {r1}\n\
+	bx r1");
+}
+#endif
+
+void ShowMapNamePopUpWindow(void) {
+	switch (gUnknown_083DFEC4->unk87CA) {
+	case 0:
+		sub_80F443C(gUnknown_083DFEC4->unk8788, gUnknown_083DFEC4->unk893c[gUnknown_083DFEC4->unk876E].unk2);
+		break;
+	case 1:
+		sub_80F445C(gUnknown_083DFEC4->unk8788, gUnknown_083DFEC4->unk876E + 1);
+		break;
+	default:
+		return;
+	}
+	BasicInitMenuWindow(&gWindowConfig_81E710C);
+	MenuPrint(gUnknown_083DFEC4->unk8788, 1, 6);
+}
+
+void sub_80F081C(u8 arg0) {
+	u32 tmp0;
+	BasicInitMenuWindow(&gWindowConfig_81E710C);
+	switch (arg0) {
+	case 0:
+	case 1:
+		MenuPrint_RightAligned(gOtherText_NumberRegistered, 0xA, 0x9);
+		if (arg0 != 0) return;
+	case 2:
+		ConvertIntToDecimalStringN(gUnknown_083DFEC4->unk8788, gUnknown_083DFEC4->unk8774 + 1, 0x1, 0x5);
+		MenuPrint_RightAligned(gUnknown_083DFEC4->unk8788, 0xA, 0xB);
+		if (arg0 != 0) return;
+	case 3:
+		MenuPrint_RightAligned(gOtherText_NumberBattles, 0xA, 0xD);
+		if (arg0 != 0) return;
+	case 4:
+		if ((tmp0 = GetGameStat(0x9)) > 0x1869F) tmp0 = 0x1869F;
+		ConvertIntToDecimalStringN(gUnknown_083DFEC4->unk8788, tmp0, 0x1, 0x5);
+		MenuPrint_RightAligned(gUnknown_083DFEC4->unk8788, 0xA, 0xF);
+	}
+}
+
+void sub_80F08E4(void) {
+	BasicInitMenuWindow(&gWindowConfig_81E710C);
+	MenuZeroFillWindowRect(0, 0x9, 0xB, 0x10);
+}
+
+void sub_80F0900(void) {
+	s16 tmp0 = gUnknown_083DFEC4->unk8772 - gUnknown_083DFEC4->unk8770 + 1;
+	if (tmp0 <= 7) {
+		MenuZeroFillWindowRect(0xC, 0x1, 0x1F, 0xF);
+	}
+	sub_80F0954(gUnknown_083DFEC4->unk8770, 0, tmp0);
+}
+
+u8 sub_80F0944(void) {
+	return sub_80F098C();
+}
+
+void sub_80F0954(u16 arg0, u16 arg1, u16 arg2) {
+	gUnknown_083DFEC4->unk877E = arg0;
+	gUnknown_083DFEC4->unk8780 = arg1;
+	gUnknown_083DFEC4->unk8784 = arg2;
+	gUnknown_083DFEC4->unk8786 = 0;
+}
+
+#if 0
+bool8 sub_80F098C(void) {
+	u16 tmp0;
+	u32 tmp1;
+	u32 tmp2;
+	if (!gUnknown_083DFEC4->unk8784) return FALSE;
+	tmp1 = gUnknown_083DFEC4->unk87CA;
+
+	__call_via_r2(
+                      gUnknown_083DFEC4->unk877E,
+                      gUnknown_083DFEC4->unk87CA,
+                      gUnknown_083DFEC4->unk0000[tmp1]
+                      );
+	gUnknown_083DFEC4->unk8784--;
+	tmp2 = 0xFFFF;
+	if (gUnknown_083DFEC4->unk8784 << 16) return FALSE;
+	gUnknown_083DFEC4->unk877E++;
+	tmp0 = gUnknown_083DFEC4->unk877E & tmp2;
+	if (tmp0 < gUnknown_083DFEC4->unk8774) {
+		gUnknown_083DFEC4->unk877E = 0;
+	}
+	gUnknown_083DFEC4->unk8780 = (gUnknown_083DFEC4->unk8780 + 2) & 0x1F;
+	return TRUE;
+}
+#else
+__attribute__((naked))
+bool8 sub_80F098C(void) {
+	asm_unified("push {r4-r7,lr}\n\
+	mov r7, r8\n\
+	push {r7}\n\
+	ldr r0, _080F09A4 @ =gUnknown_083DFEC4\n\
+	ldr r6, [r0]\n\
+	ldr r0, _080F09A8 @ =0x00008784\n\
+	adds r7, r6, r0\n\
+	ldrh r0, [r7]\n\
+	cmp r0, 0\n\
+	bne _080F09AC\n\
+_080F09A0:\n\
+	movs r0, 0\n\
+	b _080F0A02\n\
+	.align 2, 0\n\
+_080F09A4: .4byte gUnknown_083DFEC4\n\
+_080F09A8: .4byte 0x00008784\n\
+_080F09AC:\n\
+	movs r1, 0\n\
+	mov r8, r1\n\
+	ldr r1, _080F0A0C @ =gUnknown_083E3270\n\
+	ldr r2, _080F0A10 @ =0x000087ca\n\
+	adds r0, r6, r2\n\
+	ldrb r2, [r0]\n\
+	lsls r2, 2\n\
+	adds r2, r1\n\
+	ldr r0, _080F0A14 @ =0x0000877e\n\
+	adds r4, r6, r0\n\
+	ldrh r0, [r4]\n\
+	ldr r1, _080F0A18 @ =0x00008780\n\
+	adds r5, r6, r1\n\
+	ldrh r1, [r5]\n\
+	ldr r2, [r2]\n\
+	bl _call_via_r2\n\
+	ldrh r0, [r7]\n\
+	subs r0, 0x1\n\
+	strh r0, [r7]\n\
+	ldr r2, _080F0A1C @ =0x0000ffff\n\
+	adds r1, r2, 0\n\
+	lsls r0, 16\n\
+	cmp r0, 0\n\
+	beq _080F09A0\n\
+	ldrh r0, [r4]\n\
+	adds r0, 0x1\n\
+	strh r0, [r4]\n\
+	ands r0, r1\n\
+	ldr r2, _080F0A20 @ =0x00008774\n\
+	adds r1, r6, r2\n\
+	movs r2, 0\n\
+	ldrsh r1, [r1, r2]\n\
+	cmp r0, r1\n\
+	ble _080F09F6\n\
+	mov r0, r8\n\
+	strh r0, [r4]\n\
+_080F09F6:\n\
+	ldrh r0, [r5]\n\
+	adds r0, 0x2\n\
+	movs r1, 0x1F\n\
+	ands r0, r1\n\
+	strh r0, [r5]\n\
+	movs r0, 0x1\n\
+_080F0A02:\n\
+	pop {r3}\n\
+	mov r8, r3\n\
+	pop {r4-r7}\n\
+	pop {r1}\n\
+	bx r1\n\
+	.align 2, 0\n\
+_080F0A0C: .4byte gUnknown_083E3270\n\
+_080F0A10: .4byte 0x000087ca\n\
+_080F0A14: .4byte 0x0000877e\n\
+_080F0A18: .4byte 0x00008780\n\
+_080F0A1C: .4byte 0x0000ffff\n\
+_080F0A20: .4byte 0x00008774");
+}
+#endif
+
+void sub_80F0A24(u16 arg0, u16 arg1) {
+	u32 tmp0;
+	if (!gUnknown_083DFEC4->unk87C8)
+		tmp0 = 0x2;
+	else tmp0 = 0x1;
+	sub_80F4428(gUnknown_083DFEC4->unk8788, arg0, tmp0);
+	BasicInitMenuWindow(&gWindowConfig_81E70D4);
+	MenuPrint(gUnknown_083DFEC4->unk8788, 0xD, arg1);
+}
+#if 0
+void sub_80F0A74(u16 arg0, u16 arg1) {
+	sub_80F700C(gUnknown_083DFEC4->unk8788, arg0);
+	BasicInitMenuWindow(&gWindowConfig_81E70D4);
+	MenuPrint_PixelCoords(gUnknown_083DFEC4->unk8788, 0x61, (arg1 & 0x1F) << 3, 0);
+	// TODO: match if/else
+	if ((arg0 >= gUnknown_083DFEC4->unkD158) || (gUnknown_083DFEC4->unkCEE8[arg0].filler2[3] != 0)) {
+		sub_8095C8C((void *)VRAM + 0xF000, 0x1D, (arg1 & 0x1F), gUnknown_083E03A0, 0, 0, 1, 2, 2);
+	}
+	else {
+		sub_8095C8C((void *)VRAM + 0xF000, 0x1D, (arg1 & 0x1F), gUnknown_083E039C, 0, 0, 1, 2, 2);
+	}
+}
+#else
+__attribute__((naked))
+void sub_80F0A74(u16 arg0, u16 arg1) {
+	asm_unified("push {r4-r7,lr}\n\
+	sub sp, 0x14\n\
+	lsls r0, 16\n\
+	lsrs r6, r0, 16\n\
+	lsls r1, 16\n\
+	lsrs r7, r1, 16\n\
+	ldr r0, _080F0ADC @ =gUnknown_083DFEC4\n\
+	ldr r5, [r0]\n\
+	ldr r0, _080F0AE0 @ =0x00008788\n\
+	adds r4, r5, r0\n\
+	adds r0, r4, 0\n\
+	adds r1, r6, 0\n\
+	bl sub_80F700C\n\
+	movs r0, 0x1F\n\
+	ands r7, r0\n\
+	ldr r0, _080F0AE4 @ =gWindowConfig_81E70D4\n\
+	bl BasicInitMenuWindow\n\
+	lsls r2, r7, 3\n\
+	adds r0, r4, 0\n\
+	movs r1, 0x61\n\
+	movs r3, 0\n\
+	bl MenuPrint_PixelCoords\n\
+	ldr r1, _080F0AE8 @ =0x0000d158\n\
+	adds r0, r5, r1\n\
+	ldrh r0, [r0]\n\
+	cmp r6, r0\n\
+	bcs _080F0AF8\n\
+	lsls r0, r6, 3\n\
+	adds r0, r5, r0\n\
+	ldr r1, _080F0AEC @ =0x0000ceed\n\
+	adds r0, r1\n\
+	ldrb r0, [r0]\n\
+	cmp r0, 0\n\
+	beq _080F0AF8\n\
+	ldr r0, _080F0AF0 @ =0x0600f000\n\
+	ldr r3, _080F0AF4 @ =gUnknown_083E039C\n\
+	movs r1, 0\n\
+	str r1, [sp]\n\
+	str r1, [sp, 0x4]\n\
+	movs r2, 0x1\n\
+	str r2, [sp, 0x8]\n\
+	movs r1, 0x2\n\
+	str r1, [sp, 0xC]\n\
+	str r2, [sp, 0x10]\n\
+	movs r1, 0x1D\n\
+	adds r2, r7, 0\n\
+	bl sub_8095C8C\n\
+	b _080F0B14\n\
+	.align 2, 0\n\
+_080F0ADC: .4byte gUnknown_083DFEC4\n\
+_080F0AE0: .4byte 0x00008788\n\
+_080F0AE4: .4byte gWindowConfig_81E70D4\n\
+_080F0AE8: .4byte 0x0000d158\n\
+_080F0AEC: .4byte 0x0000ceed\n\
+_080F0AF0: .4byte 0x0600f000\n\
+_080F0AF4: .4byte gUnknown_083E039C\n\
+_080F0AF8:\n\
+	ldr r0, _080F0B1C @ =0x0600f000\n\
+	ldr r3, _080F0B20 @ =gUnknown_083E03A0\n\
+	movs r1, 0\n\
+	str r1, [sp]\n\
+	str r1, [sp, 0x4]\n\
+	movs r2, 0x1\n\
+	str r2, [sp, 0x8]\n\
+	movs r1, 0x2\n\
+	str r1, [sp, 0xC]\n\
+	str r2, [sp, 0x10]\n\
+	movs r1, 0x1D\n\
+	adds r2, r7, 0\n\
+	bl sub_8095C8C\n\
+_080F0B14:\n\
+	add sp, 0x14\n\
+	pop {r4-r7}\n\
+	pop {r0}\n\
+	bx r0\n\
+	.align 2, 0\n\
+_080F0B1C: .4byte 0x0600f000\n\
+_080F0B20: .4byte gUnknown_083E03A0");
+}
+#endif
+
+void sub_80F0B24(void) {
+	gUnknown_083DFEC4->unkD15C = 0;
+	gUnknown_083DFEC4->unk306 = 0;
+}
+
+#if 0
+// I think there are only register differences
+bool8 sub_80F0B44(void) {
+	u16 tmp0;
+	u16 tmp1;
+	u16 i;
+	if (gUnknown_083DFEC4->unkD15C > 0x8) return FALSE;
+	++gUnknown_083DFEC4->unk306;
+	if (gUnknown_083DFEC4->unk306 < 2) return TRUE; // cmp 0x1
+	gUnknown_083DFEC4->unk306 = 0;
+	if (gUnknown_083DFEC4->unkD15C < 0x8) {
+		tmp1 = gUnknown_083DFEC4->unk8778;
+		tmp1 = ((gUnknown_083DFEC4->unkD15C << 1) + tmp1) & 0x1F;
+		if (gUnknown_083DFEC4->unk876C != gUnknown_083DFEC4->unkD15C) {
+			BasicInitMenuWindow(&gWindowConfig_81E70D4);
+			MenuZeroFillWindowRect(0xC, tmp1, 0x1F, tmp1 + 1);
+		}
+		if (gUnknown_083DFEC4->unkD15C) sub_80F08E4();
+		gUnknown_083DFEC4->unkD15C++;
+		return TRUE;
+	}
+	BasicInitMenuWindow(&gWindowConfig_81E70D4);
+	tmp0 = (gUnknown_083DFEC4->unk8778 + 0x10) & 0x1F;
+	for (i = 0; i < 0x8; ++i) {
+		MenuZeroFillWindowRect(0xC, tmp0, 0x1F, tmp0 + 1);
+		tmp0 = (tmp0 + 0x2) & 0x1F;
+	}
+	gUnknown_083DFEC4->unkD15C++;
+	return TRUE;
+}
+#else
+__attribute__((naked))
+bool8 sub_80F0B44(void) {
+	asm_unified("push {r4-r6,lr}\n\
+	ldr r0, _080F0B58 @ =gUnknown_083DFEC4\n\
+	ldr r5, [r0]\n\
+	ldr r0, _080F0B5C @ =0x0000d15c\n\
+	adds r6, r5, r0\n\
+	ldrh r0, [r6]\n\
+	cmp r0, 0x8\n\
+	bls _080F0B60\n\
+	movs r0, 0\n\
+	b _080F0C22\n\
+	.align 2, 0\n\
+_080F0B58: .4byte gUnknown_083DFEC4\n\
+_080F0B5C: .4byte 0x0000d15c\n\
+_080F0B60:\n\
+	ldr r0, _080F0BBC @ =0x00000306\n\
+	adds r1, r5, r0\n\
+	ldrh r0, [r1]\n\
+	adds r0, 0x1\n\
+	strh r0, [r1]\n\
+	lsls r0, 16\n\
+	lsrs r0, 16\n\
+	cmp r0, 0x1\n\
+	bls _080F0C20\n\
+	movs r0, 0\n\
+	strh r0, [r1]\n\
+	ldrh r0, [r6]\n\
+	cmp r0, 0x7\n\
+	bhi _080F0BCC\n\
+	ldr r0, _080F0BC0 @ =0x00008778\n\
+	adds r1, r5, r0\n\
+	ldrh r2, [r6]\n\
+	lsls r0, r2, 1\n\
+	ldrh r1, [r1]\n\
+	adds r4, r0, r1\n\
+	movs r0, 0x1F\n\
+	ands r4, r0\n\
+	ldr r1, _080F0BC4 @ =0x0000876c\n\
+	adds r0, r5, r1\n\
+	movs r1, 0\n\
+	ldrsh r0, [r0, r1]\n\
+	cmp r2, r0\n\
+	beq _080F0BAA\n\
+	ldr r0, _080F0BC8 @ =gWindowConfig_81E70D4\n\
+	bl BasicInitMenuWindow\n\
+	adds r1, r4, 0\n\
+	adds r3, r1, 0x1\n\
+	movs r0, 0xC\n\
+	movs r2, 0x1F\n\
+	bl MenuZeroFillWindowRect\n\
+_080F0BAA:\n\
+	ldrh r0, [r6]\n\
+	cmp r0, 0\n\
+	bne _080F0BB4\n\
+	bl sub_80F08E4\n\
+_080F0BB4:\n\
+	ldrh r0, [r6]\n\
+	adds r0, 0x1\n\
+	strh r0, [r6]\n\
+	b _080F0C20\n\
+	.align 2, 0\n\
+_080F0BBC: .4byte 0x00000306\n\
+_080F0BC0: .4byte 0x00008778\n\
+_080F0BC4: .4byte 0x0000876c\n\
+_080F0BC8: .4byte gWindowConfig_81E70D4\n\
+_080F0BCC:\n\
+	ldr r0, _080F0C10 @ =gWindowConfig_81E70D4\n\
+	bl BasicInitMenuWindow\n\
+	ldr r1, _080F0C14 @ =0x00008778\n\
+	adds r0, r5, r1\n\
+	ldrh r0, [r0]\n\
+	adds r4, r0, 0\n\
+	adds r4, 0x10\n\
+	movs r0, 0x1F\n\
+	ands r4, r0\n\
+	movs r5, 0\n\
+_080F0BE2:\n\
+	adds r3, r4, 0x1\n\
+	movs r0, 0xC\n\
+	adds r1, r4, 0\n\
+	movs r2, 0x1F\n\
+	bl MenuZeroFillWindowRect\n\
+	adds r4, 0x2\n\
+	movs r0, 0x1F\n\
+	ands r4, r0\n\
+	adds r0, r5, 0x1\n\
+	lsls r0, 16\n\
+	lsrs r5, r0, 16\n\
+	cmp r5, 0x7\n\
+	bls _080F0BE2\n\
+	ldr r0, _080F0C18 @ =gUnknown_083DFEC4\n\
+	ldr r1, [r0]\n\
+	ldr r0, _080F0C1C @ =0x0000d15c\n\
+	adds r1, r0\n\
+	ldrh r0, [r1]\n\
+	adds r0, 0x1\n\
+	strh r0, [r1]\n\
+	movs r0, 0\n\
+	b _080F0C22\n\
+	.align 2, 0\n\
+_080F0C10: .4byte gWindowConfig_81E70D4\n\
+_080F0C14: .4byte 0x00008778\n\
+_080F0C18: .4byte gUnknown_083DFEC4\n\
+_080F0C1C: .4byte 0x0000d15c\n\
+_080F0C20:\n\
+	movs r0, 0x1\n\
+_080F0C22:\n\
+	pop {r4-r6}\n\
+	pop {r1}\n\
+	bx r1");
+}
+#endif
+
+void sub_80F0C28(void) {
+	gUnknown_083DFEC4->unkD15C = 0;
+	gUnknown_083DFEC4->unk306 = 0;
+}
